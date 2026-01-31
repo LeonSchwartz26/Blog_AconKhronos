@@ -1,0 +1,6 @@
+baseURL = 'https://LeonSchwartz26.github.io/Blog_Leonhardt/'
+languageCode = 'zh-cn'
+title = 'Acon Khronos与世界'
+theme = 'ananke'
+[params]
+mainSections = ["posts"]
