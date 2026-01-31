@@ -1,0 +1,24 @@
+/* ===== Unify menu font with body text ===== */
+
+/* Top navigation links */
+.site-navigation a,
+.site-navigation button,
+.site-navigation .menu-item {
+  font-family: inherit;
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/* Dropdown menu items */
+.site-navigation ul ul a {
+  font-family: inherit;
+  font-weight: 400;
+}
+
+/* Mobile hamburger menu */
+.nav-toggle,
+.nav-toggle-label {
+  font-family: inherit;
+  font-weight: 400;
+}
