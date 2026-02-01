@@ -1,10 +1,32 @@
-/* ===== Unify menu font with body text (Ananke) ===== */
+/* ===== Home: map left, posts right ===== */
+.home-layout {
+  display: block;
+}
 
-/* Top navigation links */
-nav[role="navigation"] a,
-nav[role="navigation"] li {
-  font-family: inherit;
-  font-weight: 400;
-  letter-spacing: normal;
-  text-transform: none;
+.home-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 1fr) minmax(320px, 1fr);
+  gap: 2rem;
+  align-items: start;
+}
+
+.home-map .travel-map {
+  height: 380px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.home-intro {
+  margin-bottom: 1.5rem;
+}
+
+/* Mobile fallback */
+@media (max-width: 900px) {
+  .home-grid {
+    grid-template-columns: 1fr;
+  }
+  .home-map .travel-map {
+    height: 320px;
+  }
 }

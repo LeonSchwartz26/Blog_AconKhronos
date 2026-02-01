@@ -1,0 +1,29 @@
+{{ define "main" }}
+{{/* 收集所有带坐标的文章 */}}
+{{ $pages := where site.RegularPages "Params.location.lat" "ne" nil }}
+{{ $pages = where $pages "Params.location.lon" "ne" nil }}
+{{ $pages = sort $pages "Date" "desc" }}
+
+<main class="home-layout">
+  <article class="home-intro mt4">
+    <!--修改首页“在人间漂流字体颜色大小”-->
+    <h1 class="home-intro-title f3 athelas mt3 mb1 tc mid-gray">
+      {{ .Content | plainify }}
+    </h1>
+  </article>
+
+  <div class="home-grid">
+    <section class="home-map">
+      {{ partial "home-map.html" (dict "pages" $pages) }}
+    </section>
+
+    <section class="home-posts">
+      {{ range $pages }}
+        <div class="home-card">
+          {{ .Render "summary-with-image" }}
+        </div>
+      {{ end }}
+    </section>
+  </div>
+</main>
+{{ end }}

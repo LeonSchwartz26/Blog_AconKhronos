@@ -1,0 +1,53 @@
+<link rel="stylesheet" href="{{ "vendor/leaflet/leaflet.css" | relURL }}">
+
+<div id="travel-map" style="height: 460px; border-radius: 14px; overflow: hidden;"></div>
+
+<script src="{{ "vendor/leaflet/leaflet.js" | relURL }}"></script>
+
+<script>
+  {{- $places := slice -}}
+  {{- range site.Data.places -}}
+    {{- $places = $places | append (dict
+        "name" .name
+        "lat" .lat
+        "lon" .lon
+        "note" (.note | default "")
+        "url" (.url | relURL)
+      ) -}}
+  {{- end -}}
+  const PLACES = {{ $places | jsonify | safeJS }};
+  const BASE = "{{ (urls.Parse site.BaseURL).Path | strings.TrimSuffix "/" }}";
+
+  const map = L.map("travel-map", { scrollWheelZoom: true }).setView([20, 0], 2);
+  
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+  
+    const bounds = [];
+  
+  PLACES.forEach(p => {
+    if (!/^https?:\/\//i.test(p.url)) {
+      const clean = String(p.url || "").replace(/^\/+/, "");
+      p.url = (BASE ? BASE + "/" : "/") + clean;
+    }
+    const m = L.marker([p.lat, p.lon]).addTo(map);
+  
+      m.bindPopup(`
+        <div style="font-family: inherit;">
+          <b>${p.name}</b><br>
+          ${p.note ? `<span>${p.note}</span><br>` : ``}
+          <a href="${p.url}">打开文章</a>
+        </div>
+      `);
+  
+      // 点击标记直接跳转
+      m.on("click", () => window.location.href = p.url);
+  
+      bounds.push([p.lat, p.lon]);
+    });
+  
+    if (bounds.length > 1) map.fitBounds(bounds, { padding: [40, 40] });
+    if (bounds.length === 1) map.setView(bounds[0], 10);
+  </script>
+  

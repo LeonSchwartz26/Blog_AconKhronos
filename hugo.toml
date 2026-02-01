@@ -5,33 +5,24 @@ theme = 'ananke'
 [menu]
 
 [[menu.main]]
-    name = "关于"
-    url = "/about/"
-    weight = 20
-
-[[menu.main]]
-    name = "写写画画"
-    identifier = "menu"
-    url = "/menu/"
-    weight = 10
-
-[[menu.main]]
     name = "游记"
-    parent = "menu"
     url = "/posts/"
     weight = 10
 
 [[menu.main]]
     name = "学习"
-    parent = "menu"
     url = "/study/"
     weight = 20
 
 [[menu.main]]
     name = "读书"
-    parent = "menu"
     url = "/Reading/"
     weight = 30
+
+[[menu.main]]
+    name = "关于我"
+    url = "/about/"
+    weight = 40
 
 [[menu.main]]
    name = "Privacy"
@@ -44,3 +35,4 @@ theme = 'ananke'
 description = "在人间漂流"
 mainSections = ["posts", "study", "reading"]
 custom_css = ["custom.css"]
+show_post_thumbnail = true

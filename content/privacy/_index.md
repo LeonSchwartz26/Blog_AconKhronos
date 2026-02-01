@@ -42,9 +42,36 @@ Es werden **keine Tracking- oder Analyse-Tools** eingesetzt (z. B. Google Analyt
 
 ## Einbindung externer Inhalte
 
-Auf dieser Website werden derzeit **keine externen Inhalte** wie YouTube-Videos, Social-Media-Feeds oder Webfonts von Drittanbietern eingebunden.
+### Interaktive Karte (Leaflet & OpenStreetMap)
 
-Sollte sich dies in Zukunft ändern, wird diese Datenschutzerklärung entsprechend aktualisiert.
+Auf der Startseite dieser Website wird eine interaktive Karte verwendet, um besuchte Orte visuell darzustellen und auf zugehörige Blogartikel zu verlinken.
+
+Die Darstellung der Karte erfolgt mithilfe der Open-Source-JavaScript-Bibliothek **Leaflet**, welche lokal auf dieser Website gehostet wird (kein Laden von externen Skripten oder Bibliotheken).
+
+Zur Anzeige der Karteninhalte werden jedoch Kartenkacheln (Tiles) von Servern des Projekts **OpenStreetMap** geladen.
+
+#### Datenverarbeitung beim Laden der Karte
+
+Beim Aufruf einer Seite mit eingebetteter Karte stellt dein Browser eine Verbindung zu Servern von OpenStreetMap her, um die benötigten Kartenkacheln abzurufen. Dabei können aus technischen Gründen insbesondere folgende Daten verarbeitet werden:
+
+- IP-Adresse
+- Datum und Uhrzeit des Zugriffs
+- aufgerufene Kartenkacheln
+- technische Informationen des Browsers (z. B. User-Agent)
+
+Die Kartenkacheln werden über eine verteilte Infrastruktur bereitgestellt, sodass Anfragen in der Regel an geografisch nahegelegene Server weitergeleitet werden.
+
+Weitere Informationen zur Datenverarbeitung durch OpenStreetMap findest du unter:  
+https://osmfoundation.org/wiki/Privacy_Policy
+
+#### Rechtsgrundlage
+
+Die Einbindung der interaktiven Karte erfolgt auf Grundlage von  
+Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse), da sie der anschaulichen Darstellung der Inhalte sowie der verbesserten Nutzerführung auf dieser privaten, nicht-kommerziellen Website dient.
+
+#### Vermeidung der Datenverarbeitung
+
+Wenn du nicht möchtest, dass Kartenkacheln von OpenStreetMap geladen werden, kannst du Seiten mit Karteninhalten vermeiden oder externe Inhalte in deinem Browser blockieren (z. B. durch entsprechende Datenschutz- oder Content-Blocking-Einstellungen).
 
 ---
 

@@ -1,0 +1,82 @@
+<link rel="stylesheet" href="{{ "vendor/leaflet/leaflet.css" | relURL }}">
+
+<div id="travel-map" class="travel-map"></div>
+
+<script src="{{ "vendor/leaflet/leaflet.js" | relURL }}"></script>
+
+<script>
+(function () {
+  // 关键：用 index 取 dict 里的 pages
+  {{ $pages := (index . "pages") }}
+  const PLACES = [
+    {{ range $i, $p := $pages }}
+    {
+      id: {{ (md5 $p.RelPermalink) | jsonify | safeJS }},
+      title: {{ $p.Title | jsonify | safeJS }},
+      url: {{ $p.RelPermalink | jsonify | safeJS }},
+      date: {{ $p.Date.Format "2006-01-02" | jsonify | safeJS }},
+      placeName: {{ ($p.Params.location.name | default $p.Title) | jsonify | safeJS }},
+      country: {{ ($p.Params.location.country | default "Unknown") | jsonify | safeJS }},
+      lat: {{ $p.Params.location.lat }},
+      lon: {{ $p.Params.location.lon }}
+    }{{ if lt $i (sub (len $pages) 1) }},{{ end }}
+    {{ end }}
+  ];
+
+  console.log("TRAVELMAP places:", PLACES.length);
+
+  // Leaflet 是否加载成功，一眼就知道
+  if (typeof L === "undefined") {
+    console.error("Leaflet (L) is undefined. leaflet.js not loaded.");
+    return;
+  }
+
+  const map = L.map("travel-map", { scrollWheelZoom: true }).setView([20, 0], 2);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  const normalStyle = { radius: 6, weight: 2, fillOpacity: 0.8 };
+  const activeStyle = { radius: 10, weight: 3, fillOpacity: 1 };
+
+  const markersById = {};
+  const bounds = [];
+
+  function setActive(id) {
+    Object.values(markersById).forEach(m => m.setStyle(normalStyle));
+    const m = markersById[id];
+    if (!m) return;
+    m.setStyle(activeStyle);
+    map.panTo(m.getLatLng(), { animate: true, duration: 0.35 });
+    m.openPopup();
+  }
+
+  function clearActive() {
+    Object.values(markersById).forEach(m => m.setStyle(normalStyle));
+  }
+
+  PLACES.forEach(p => {
+    const marker = L.circleMarker([p.lat, p.lon], normalStyle).addTo(map);
+
+    marker.bindPopup(`
+      <div style="font-family: inherit;">
+        <b>${p.placeName}</b><br>
+        <span>${p.country}</span><br>
+        <span style="opacity:.8">${p.date}</span><br>
+        <a href="${p.url}">打开文章</a>
+      </div>
+    `);
+
+    marker.on("click", () => window.location.href = p.url);
+
+    markersById[p.id] = marker;
+    bounds.push([p.lat, p.lon]);
+  });
+
+  if (bounds.length > 1) map.fitBounds(bounds, { padding: [40, 40] });
+  if (bounds.length === 1) map.setView(bounds[0], 10);
+
+  window.__TRAVELMAP__ = { setActive, clearActive };
+})();
+</script>
