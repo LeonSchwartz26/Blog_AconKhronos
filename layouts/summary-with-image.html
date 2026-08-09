@@ -1,0 +1,47 @@
+{{/* 覆盖主题的 summary-with-image：缩略图改成响应式 srcset + 懒加载，
+     并写死 width/height 以消除 CLS。其余结构与主题保持一致，方便日后对比升级。 */}}
+{{ $featured_resource := partials.Include "func/GetFeaturedResource.html" . }}
+{{ $featured_image := partials.Include "func/GetFeaturedImage.html" . }}
+<article class="bb b--black-10">
+  <div class="db pv4 ph3 ph0-l dark-gray no-underline">
+    <div class="flex-column flex-row-ns flex">
+      {{ if $featured_image }}
+        <div class="{{ compare.Conditional (compare.Eq $.Site.Language.LanguageDirection "rtl") "pl3-ns" "pr3-ns" }} mb4 mb0-ns w-100 w-40-ns">
+          <a href="{{ .RelPermalink }}" class="db grow">
+            {{ with $featured_resource }}
+              {{ $small := partials.Include "func/img-resize.html" (dict "img" . "width" 320) }}
+              {{ $mid := partials.Include "func/img-resize.html" (dict "img" . "width" 480) }}
+              {{ $large := partials.Include "func/img-resize.html" (dict "img" . "width" 720) }}
+              <img
+                class="img"
+                src="{{ $mid.RelPermalink }}"
+                srcset="{{ $small.RelPermalink }} 320w, {{ $mid.RelPermalink }} 480w, {{ $large.RelPermalink }} 720w"
+                sizes="(min-width: 60em) 22rem, 100vw"
+                width="{{ $mid.Width }}"
+                height="{{ $mid.Height }}"
+                loading="lazy"
+                decoding="async"
+                alt="{{ $.Params.location.name | default $.Title }}">
+            {{ else }}
+              <img src="{{ $featured_image }}" class="img" loading="lazy" decoding="async" alt="{{ .Title }}">
+            {{ end }}
+          </a>
+        </div>
+      {{ end }}
+      <div class="blah w-100{{ if $featured_image }} w-60-ns {{ compare.Conditional (compare.Eq $.Site.Language.LanguageDirection "rtl") "pr3-ns" "pl3-ns" }}{{ end }}">
+        <h1 class="f3 fw1 athelas mt0 lh-title">
+          <a href="{{ .RelPermalink }}" class="color-inherit dim link">
+            {{ .Title }}
+          </a>
+        </h1>
+        <div class="f6 f5-l lh-copy nested-copy-line-height nested-links">
+          {{ .Summary }}
+        </div>
+        {{ with .Params.author | compare.Default .Site.Params.author }}
+          <p class="f6 lh-copy mv0">By {{ . }}</p>
+        {{- end -}}
+        <a href="{{ .RelPermalink }}" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">{{ $.Param "read_more_copy" | compare.Default (lang.Translate "readMore") }}</a>
+      </div>
+    </div>
+  </div>
+</article>

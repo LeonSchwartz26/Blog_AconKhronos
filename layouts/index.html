@@ -1,8 +1,13 @@
 {{ define "main" }}
-{{/* 收集所有带坐标的文章 */}}
-{{ $pages := where site.RegularPages "Params.location.lat" "ne" nil }}
-{{ $pages = where $pages "Params.location.lon" "ne" nil }}
-{{ $pages = sort $pages "Date" "desc" }}
+{{/* 首页文章流：主 section 下的全部文章（study / reading 不该因为没有坐标而消失） */}}
+{{ $posts := where site.RegularPages "Section" "in" site.Params.mainSections }}
+{{ $posts = sort $posts "Date" "desc" }}
+
+{{/* 地图只取带完整坐标的文章 */}}
+{{ $mapped := where $posts "Params.location.lat" "ne" nil }}
+{{ $mapped = where $mapped "Params.location.lon" "ne" nil }}
+
+{{ $paginator := .Paginate $posts }}
 
 <main class="home-layout">
   <article class="home-intro mt4">
@@ -14,15 +19,17 @@
 
   <div class="home-grid">
     <section class="home-map">
-      {{ partial "home-map.html" (dict "pages" $pages) }}
+      {{ partial "home-map.html" (dict "pages" $mapped) }}
     </section>
 
     <section class="home-posts">
-      {{ range $pages }}
-        <div class="home-card">
-          {{ .Render "summary-with-image" }}
+      {{ range $p := $paginator.Pages }}
+        {{/* data-map-id 让 travel-map.js 把卡片和地图上的点位对应起来 */}}
+        <div class="home-card"{{ with $p.Params.location.lat }} data-map-id="{{ $p.RelPermalink }}"{{ end }}>
+          {{ $p.Render "summary-with-image" }}
         </div>
       {{ end }}
+      {{ partial "pagination.html" . }}
     </section>
   </div>
 </main>

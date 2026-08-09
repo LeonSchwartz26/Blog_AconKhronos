@@ -1,0 +1,27 @@
+{{/*
+  func/GetFeaturedImage —— 覆盖主题同名 partial
+
+  与主题版本行为一致，唯一区别：命中页面资源时先压到 1600px 宽的 webp 再返回 URL。
+  主题原版直接返回原图，会把相机直出的几 MB JPG 塞进 hero 背景。
+
+  hero 是 CSS background-image，用不了 srcset，所以这里只出一个尺寸。
+
+  @context Page
+
+  @returns String  封面图 URL，没有则空字符串
+*/}}
+{{ $link := "" }}
+
+{{ with partials.Include "func/GetFeaturedResource.html" . }}
+  {{ $link = (partials.Include "func/img-resize.html" (dict "img" . "width" 1600)).RelPermalink }}
+{{ else }}
+  {{/* 不是页面资源（例如指向 static/ 的路径），退回主题原有行为 */}}
+  {{ with .Params.featured_image }}
+    {{ $link = strings.Trim . "/" | urls.AbsURL }}
+    {{ with $.Resources.GetMatch . }}
+      {{ $link = .RelPermalink }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+
+{{ return $link }}

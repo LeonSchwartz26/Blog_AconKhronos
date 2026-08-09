@@ -1,7 +1,27 @@
-baseURL = 'https://LeonSchwartz26.github.io/Blog_Leonhardt/'
-languageCode = 'zh-cn'
+baseURL = 'https://LeonSchwartz26.github.io/Blog_AconKhronos/'
+languageCode = 'zh-CN'
 title = 'Acon Khronos与世界'
 theme = 'ananke'
+
+enableRobotsTXT = true
+enableGitInfo = true          # 用 git 提交时间当 lastmod，需要 CI 里 fetch-depth: 0
+timeZone = 'Europe/Berlin'
+
+[pagination]
+  pagerSize = 10
+
+[module]
+  [module.hugoVersion]
+    min = '0.146.0'           # ananke 的 layouts/_partials 新布局结构起点
+
+[frontmatter]
+  lastmod = ['lastmod', ':git', 'date']
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      hardWraps = true        # 单个换行 → <br>，保住散文诗的断行；空行照旧分段
+
 [menu]
 
 [[menu.main]]
@@ -10,13 +30,18 @@ theme = 'ananke'
     weight = 10
 
 [[menu.main]]
+    name = "杂记"
+    url = "/misc/"
+    weight = 15
+
+[[menu.main]]
     name = "学习"
     url = "/study/"
     weight = 20
 
 [[menu.main]]
     name = "读书"
-    url = "/Reading/"
+    url = "/reading/"
     weight = 30
 
 [[menu.main]]
@@ -33,6 +58,6 @@ theme = 'ananke'
 
 [params]
 description = "在人间漂流"
-mainSections = ["posts", "study", "reading"]
+mainSections = ["posts", "misc", "study", "reading"]
 custom_css = ["custom.css"]
 show_post_thumbnail = true

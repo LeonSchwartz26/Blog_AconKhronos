@@ -1,0 +1,35 @@
+{{/*
+  正文图片渲染钩子。
+
+  Markdown 里写 ![alt](IMG_1.JPG "可选标题") 时：
+  - 指向页面 bundle 内的图片 → 压缩成 webp 并输出 srcset
+  - 外链或 static/ 图片 → 原样输出，只补上 loading / decoding
+  有 title 时包一层 <figure> 输出图注。
+*/}}
+{{- $img := "" -}}
+{{- if not (urls.Parse .Destination).IsAbs -}}
+  {{- $img = .PageInner.Resources.GetMatch .Destination -}}
+  {{- with and $img (ne $img.ResourceType "image") -}}{{- $img = "" -}}{{- end -}}
+{{- end -}}
+
+{{- with .Title -}}<figure class="post-figure">{{- end -}}
+
+{{- with $img -}}
+  {{- $mid := partials.Include "func/img-resize.html" (dict "img" . "width" 960) -}}
+  <img
+    src="{{ $mid.RelPermalink }}"
+    srcset="
+      {{ (partials.Include "func/img-resize.html" (dict "img" . "width" 480)).RelPermalink }} 480w,
+      {{ $mid.RelPermalink }} 960w,
+      {{ (partials.Include "func/img-resize.html" (dict "img" . "width" 1600)).RelPermalink }} 1600w"
+    sizes="(min-width: 50em) 45rem, 100vw"
+    width="{{ $mid.Width }}"
+    height="{{ $mid.Height }}"
+    loading="lazy"
+    decoding="async"
+    alt="{{ $.Text | plainify }}">
+{{- else -}}
+  <img src="{{ .Destination | safeURL }}" loading="lazy" decoding="async" alt="{{ .Text | plainify }}">
+{{- end -}}
+
+{{- with .Title -}}<figcaption class="post-figcaption">{{ . }}</figcaption></figure>{{- end -}}

@@ -1,24 +1,144 @@
+/* 这个文件会被 ananke 的 GetMainCSS 拼在 main.css 最末尾，
+   所以同优先级的选择器可以直接盖掉主题的 Tachyons 工具类。 */
+
+:root {
+  /* 汉字放在拉丁字体之后，浏览器会逐字符回退：
+     德语/英文仍走主题原本的字体，中文落到系统黑体。 */
+  --cjk: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", sans-serif;
+}
+
+/* ===== Typography =====
+   主题的字体类全是纯拉丁栈（Athelas / Georgia / Avenir 都不含汉字），
+   不覆盖的话中文会掉进浏览器默认兜底：macOS 是宋体、Windows 是 SimSun、
+   Android 干脆没有中文衬线 —— 同一个页面在三个平台三种样子。 */
+.avenir {
+  font-family: "avenir next", avenir, -apple-system, BlinkMacSystemFont,
+               "helvetica neue", helvetica, roboto, "segoe ui", arial,
+               var(--cjk);
+}
+
+.athelas {
+  font-family: athelas, georgia, var(--cjk), serif;
+}
+
+.serif {
+  font-family: georgia, times, var(--cjk), serif;
+}
+
+/* 中文字面率高，1.5 的行距太挤；德语段落（privacy 页 lang="de"）不受影响 */
+:lang(zh) .lh-copy {
+  line-height: 1.8;
+}
+
+/* .tracked 是 letter-spacing:.1em，打在汉字上会变成「游 记」 */
+:lang(zh) .tracked {
+  letter-spacing: 0;
+}
+
+/* 中文标题很容易末行只剩一两个字 */
+h1,
+h2,
+.home-intro-title {
+  text-wrap: balance;
+}
+
+.lh-copy p {
+  text-wrap: pretty;
+}
+
 /* ===== Home: map left, posts right ===== */
 .home-layout {
   display: block;
 }
 
+/* 主题其它页面都是 mw7/mw8 居中，首页原本铺满视口，宽屏上和内页割裂 */
+.home-intro,
+.home-grid {
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+.home-intro {
+  margin-bottom: 1.5rem;
+}
+
 .home-grid {
   display: grid;
-  grid-template-columns: minmax(320px, 1fr) minmax(320px, 1fr);
+  /* 地图是方的不需要那么宽；右栏卡片内部还要再切 40% 缩略图 + 60% 文字，
+     50/50 会把摘要挤成细长一条 */
+  grid-template-columns: minmax(300px, 0.85fr) minmax(360px, 1.15fr);
   gap: 2rem;
   align-items: start;
 }
 
-.home-map .travel-map {
+/* 地图在侧栏里跟随滚动，长文章流时不会滑出视野 */
+@media (min-width: 901px) {
+  .home-map {
+    position: sticky;
+    top: 1rem;
+  }
+}
+
+/* 卡片 hover 时地图上的对应点位会高亮，这里给个视觉提示 */
+.home-card {
+  transition: background-color 0.2s ease;
+}
+
+.home-card:hover,
+.home-card:focus-within {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* Tachyons 没给可见的焦点环，键盘 Tab 过来看不出选中了哪张卡片 */
+.home-card:focus-within {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* 照片长宽比不一会让右栏卡片高度参差、节奏很乱，统一裁成 4:3 */
+.home-card .img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+/* ===== Travel map ===== */
+.travel-map {
   height: 380px;
   border-radius: 14px;
   overflow: hidden;
   border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-.home-intro {
-  margin-bottom: 1.5rem;
+.travel-map-popup a {
+  display: inline-block;
+  margin-top: 0.25rem;
+}
+
+/* 无 JS 时降级成一个地点列表 */
+.travel-map-fallback {
+  list-style: none;
+  margin: 0;
+  padding: 1rem;
+}
+
+/* ===== Post images ===== */
+.post-figure {
+  margin: 1.5rem 0;
+}
+
+.post-figcaption {
+  font-size: 0.85rem;
+  opacity: 0.7;
+  margin-top: 0.5rem;
+}
+
+/* 正文和缩略图都可能被 srcset 换成不同尺寸，统一约束避免溢出 */
+.post-figure img,
+.nested-copy-line-height img {
+  max-width: 100%;
+  height: auto;
 }
 
 /* Mobile fallback */
@@ -26,7 +146,13 @@
   .home-grid {
     grid-template-columns: 1fr;
   }
-  .home-map .travel-map {
+  .travel-map {
     height: 320px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-card {
+    transition: none;
   }
 }

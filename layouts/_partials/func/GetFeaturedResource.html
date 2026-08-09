@@ -1,0 +1,31 @@
+{{/*
+  func/GetFeaturedResource
+
+  返回本页的封面图「资源对象」（而非 URL），这样调用方可以自行决定尺寸、srcset 等。
+  查找顺序与主题的 func/GetFeaturedImage 保持一致：
+    1. front matter 的 featured_image 命中的页面资源
+    2. 页面资源里第一张文件名含 feature / cover 的图片
+
+  封面图放在 static/ 而非页面 bundle 里时无法处理，返回 false。
+
+  @context Page
+
+  @returns Resource(image) | false
+*/}}
+{{ $res := false }}
+
+{{ with .Params.featured_image }}
+  {{ with $.Resources.GetMatch . }}
+    {{ if eq .ResourceType "image" }}
+      {{ $res = . }}
+    {{ end }}
+  {{ end }}
+{{ else }}
+  {{ with .Resources.ByType "image" }}
+    {{ with .GetMatch "**{feature,cover}*" }}
+      {{ $res = . }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+
+{{ return $res }}

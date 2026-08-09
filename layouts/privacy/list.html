@@ -1,0 +1,10 @@
+{{/* 站点整体是 zh-CN，但这一页正文全是德语。
+     主题的 baseof 把 <html lang> 写死成站点语言，这里给内容包一层 lang="de"，
+     让屏幕阅读器和搜索引擎不至于用中文规则去读德语法条。 */}}
+{{ define "main" }}
+  <article class="pa3 pa4-ns nested-copy-line-height">
+    <section lang="de" class="cf ph3 ph5-l pv3 pv4-l f5 center measure-wide lh-copy nested-links {{ $.Param "text_color" | compare.Default "mid-gray" }}">
+      {{- .Content -}}
+    </section>
+  </article>
+{{ end }}

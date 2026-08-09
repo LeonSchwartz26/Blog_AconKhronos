@@ -1,0 +1,9 @@
+User-agent: *
+{{/* 覆盖主题的 robots.txt：主题用 urls.AbsURL "/sitemap.xml"，
+     前导斜杠会让 baseURL 里的子目录（/Blog_Leonhardt/）被丢掉，指向不存在的地址。 */ -}}
+{{ if hugo.IsProduction -}}
+Allow: /
+Sitemap: {{ printf "%ssitemap.xml" site.Home.Permalink }}
+{{ else -}}
+Disallow: /
+{{ end -}}

@@ -1,0 +1,20 @@
+{{/*
+  func/img-resize
+
+  把图片资源缩放到指定宽度并转成 webp。小于目标宽度时不放大，只做格式转换。
+
+  @context Map  {"img": Resource(image), "width": int}
+
+  @returns Resource
+*/}}
+{{ $img := .img }}
+{{ $w := .width }}
+{{ $out := $img }}
+
+{{ if gt $img.Width $w }}
+  {{ $out = $img.Resize (fmt.Printf "%dx webp q82" $w) }}
+{{ else if ne $img.MediaType.SubType "webp" }}
+  {{ $out = $img.Resize (fmt.Printf "%dx webp q82" $img.Width) }}
+{{ end }}
+
+{{ return $out }}

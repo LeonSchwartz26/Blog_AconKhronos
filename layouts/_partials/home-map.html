@@ -1,0 +1,49 @@
+{{/*
+  home-map
+
+  渲染一张带点位的 Leaflet 地图。数据以 JSON 注入，逻辑在 assets/js/travel-map.js，
+  两者通过容器 id 关联，所以同一页面可以安全地放多张地图。
+
+  @context Map  {"pages": Pages(需含 params.location.lat/lon), "id": String(可选)}
+*/}}
+{{ $id := .id | default "travel-map" }}
+
+{{ $places := slice }}
+{{ range .pages }}
+  {{ $places = $places | append (dict
+      "id"        .RelPermalink
+      "title"     .Title
+      "url"       .RelPermalink
+      "date"      (.Date.Format "2006-01-02")
+      "placeName" (.Params.location.name | default .Title)
+      "country"   (.Params.location.country)
+      "lat"       .Params.location.lat
+      "lon"       .Params.location.lon) }}
+{{ end }}
+
+{{ with $places }}
+  {{ with resources.Get "vendor/leaflet/leaflet.css" }}
+    <link rel="stylesheet" href="{{ (. | minify | fingerprint).RelPermalink }}">
+  {{ end }}
+
+  <div id="{{ $id }}" class="travel-map" data-travel-map role="region" aria-label="旅行地图">
+    <noscript>
+      <ul class="travel-map-fallback">
+        {{ range . }}
+          <li><a href="{{ .url }}">{{ .placeName }}{{ with .country }}（{{ . }}）{{ end }}</a></li>
+        {{ end }}
+      </ul>
+    </noscript>
+  </div>
+
+  {{/* jsonify 会把 < > & 转成 \u00xx，所以 </script> 无法提前闭合，safeJS 在这里是安全的；
+       不加 safeJS 的话 Go 模板会把整段 JSON 再包一层字符串字面量。 */}}
+  <script type="application/json" data-travel-map-for="{{ $id }}">{{ . | jsonify | safeJS }}</script>
+
+  {{ with resources.Get "vendor/leaflet/leaflet.js" }}
+    <script defer src="{{ (. | fingerprint).RelPermalink }}"></script>
+  {{ end }}
+  {{ with resources.Get "js/travel-map.js" }}
+    <script defer src="{{ (. | minify | fingerprint).RelPermalink }}"></script>
+  {{ end }}
+{{ end }}
