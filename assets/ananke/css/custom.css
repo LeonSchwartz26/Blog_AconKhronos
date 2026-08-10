@@ -5,6 +5,10 @@
   /* 汉字放在拉丁字体之后，浏览器会逐字符回退：
      德语/英文仍走主题原本的字体，中文落到系统黑体。 */
   --cjk: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", sans-serif;
+
+  /* 地图点位色。travel-map.js 用 getComputedStyle 读这个值，
+     所以改配色只改这一处，JS 不用动。 */
+  --map-accent: #9c4a33;
 }
 
 /* ===== Typography =====
@@ -111,9 +115,91 @@ h2,
   border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
+/* 点位在 hover / focus 时会被 setStyle 换成放大版，这里补上过渡 */
+.travel-map-marker {
+  transition: fill-opacity 0.2s ease, stroke-width 0.2s ease, r 0.2s ease;
+}
+
+/* ----- 气泡 -----
+   Leaflet 默认气泡是圆角白盒 + 重投影 + 系统无衬线，和正文的衬线调性不搭 */
+.travel-map-popup-box .leaflet-popup-content-wrapper {
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  padding: 0;
+}
+
+.travel-map-popup-box .leaflet-popup-content {
+  margin: 0.85rem 1rem;
+  font-family: georgia, times, var(--cjk), serif;
+  line-height: 1.5;
+}
+
+.travel-map-popup-box .leaflet-popup-tip {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.travel-map-popup strong {
+  font-size: 1rem;
+}
+
+/* 国家、日期是次要信息，压下去让地名和链接立住 */
+.travel-map-popup span {
+  font-size: 0.85rem;
+  opacity: 0.65;
+}
+
 .travel-map-popup a {
   display: inline-block;
-  margin-top: 0.25rem;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--map-accent);
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+}
+
+.travel-map-popup a::after {
+  content: " →";
+}
+
+.travel-map-popup-box .leaflet-popup-close-button {
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0.35rem 0 0;
+  font-size: 1rem;
+  color: rgba(0, 0, 0, 0.35);
+}
+
+/* ----- 控件 -----
+   默认 +/− 是黑框粗按钮，在淡色底图上存在感过强 */
+.travel-map .leaflet-control-zoom {
+  border: none;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.travel-map .leaflet-control-zoom a {
+  width: 1.75rem;
+  height: 1.75rem;
+  line-height: 1.75rem;
+  font-size: 1rem;
+  color: rgba(0, 0, 0, 0.55);
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+.travel-map .leaflet-control-zoom a:hover {
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.travel-map .leaflet-control-attribution {
+  background: rgba(255, 255, 255, 0.75);
+  font-size: 0.65rem;
+  padding: 0 0.4rem;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.travel-map .leaflet-control-attribution a {
+  color: rgba(0, 0, 0, 0.55);
 }
 
 /* 无 JS 时降级成一个地点列表 */

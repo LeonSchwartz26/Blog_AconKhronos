@@ -3,8 +3,30 @@
 (function () {
   "use strict";
 
-  var NORMAL = { radius: 6, weight: 2, fillOpacity: 0.8 };
-  var ACTIVE = { radius: 10, weight: 3, fillOpacity: 1 };
+  /* 点位色取自 CSS 的 --map-accent，配色改动收敛在 custom.css 一处 */
+  function accent() {
+    var v = getComputedStyle(document.documentElement)
+      .getPropertyValue("--map-accent")
+      .trim();
+    return v || "#9c4a33";
+  }
+
+  /* 白描边让点在淡色底图上有一圈呼吸感，不至于糊进地面 */
+  function baseStyle() {
+    return {
+      className: "travel-map-marker",
+      color: "#fff",
+      opacity: 1,
+      fillColor: accent(),
+      radius: 6,
+      weight: 2,
+      fillOpacity: 0.9
+    };
+  }
+
+  function activeStyle() {
+    return Object.assign(baseStyle(), { radius: 9, weight: 3, fillOpacity: 1 });
+  }
 
   function readPlaces(container) {
     var payload = document.querySelector(
@@ -49,20 +71,41 @@
     var places = readPlaces(container);
     if (!places.length) return;
 
-    var map = L.map(container, { scrollWheelZoom: false });
+    var map = L.map(container, {
+      scrollWheelZoom: false,
+      /* 不锁死的话可以一直缩到世界地图周围全是灰底 */
+      minZoom: 2,
+      maxBounds: [[-85, -180], [85, 180]],
+      maxBoundsViscosity: 1
+    });
 
-    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 19,
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+    /* Leaflet 默认前缀是「🇺🇦 Leaflet」，一面国旗 emoji 在这里太抢眼；
+       OSM 与 CARTO 的署名是使用条款要求的，保留。 */
+    map.attributionControl.setPrefix("");
+
+    L.tileLayer(
+      "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+      {
+        subdomains: "abcd",
+        maxZoom: 19,
+        noWrap: true,
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
+          '&copy; <a href="https://carto.com/attributions">CARTO</a>'
+      }
+    ).addTo(map);
 
     var markersById = Object.create(null);
     var bounds = [];
 
     places.forEach(function (place) {
-      var marker = L.circleMarker([place.lat, place.lon], NORMAL).addTo(map);
-      marker.bindPopup(buildPopup(place));
+      var marker = L.circleMarker([place.lat, place.lon], baseStyle()).addTo(map);
+      /* autoPan 关掉：setActive 里已经有 panTo，两者同时动会互相拉扯 */
+      marker.bindPopup(buildPopup(place), {
+        className: "travel-map-popup-box",
+        autoPan: false,
+        closeButton: true
+      });
       markersById[place.id] = marker;
       bounds.push([place.lat, place.lon]);
     });
@@ -75,7 +118,7 @@
 
     function clearActive() {
       Object.keys(markersById).forEach(function (id) {
-        markersById[id].setStyle(NORMAL);
+        markersById[id].setStyle(baseStyle());
       });
     }
 
@@ -83,8 +126,8 @@
       clearActive();
       var marker = markersById[id];
       if (!marker) return;
-      marker.setStyle(ACTIVE);
-      map.panTo(marker.getLatLng());
+      marker.setStyle(activeStyle());
+      map.panTo(marker.getLatLng(), { animate: true, duration: 0.4 });
       marker.openPopup();
     }
 

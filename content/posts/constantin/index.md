@@ -12,10 +12,8 @@ draft: false
 
 Dortmund Hbf, Dortmund, NRW, Deutschland.
 <!--more-->
-shot on 10. August 2025
 
-
-![Dortmund Hbf. shot on 10. August 2025](IMG_1.JPG)
+![Dortmund 中央車站站前廣場](IMG_1.JPG "Dortmund Hbf. shot on 10. August 2025")
 
 和煦朝阳。
 
