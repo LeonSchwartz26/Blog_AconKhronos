@@ -1,5 +1,7 @@
-baseURL = 'https://LeonSchwartz26.github.io/Blog_AconKhronos/'
+baseURL = 'https://leonschwartz26.github.io/Blog_AconKhronos/'
 languageCode = 'zh-CN'
+# 不写的话 Hugo 按 en 处理：主题的界面文字（read more）和日期都会是英文
+defaultContentLanguage = 'zh'
 title = 'Acon Khronos与世界'
 theme = 'ananke'
 
@@ -7,8 +9,12 @@ enableRobotsTXT = true
 enableGitInfo = true          # 用 git 提交时间当 lastmod，需要 CI 里 fetch-depth: 0
 timeZone = 'Europe/Berlin'
 
+# 没有用到标签 / 分类，不生成空的 /tags/、/categories/ 页面
+disableKinds = ['taxonomy', 'term']
+
 [pagination]
   pagerSize = 10
+  disableAliases = true       # 不生成 /page/1/ 这类只做跳转的页面
 
 [module]
   [module.hugoVersion]
@@ -19,10 +25,17 @@ timeZone = 'Europe/Berlin'
 
 [markup]
   [markup.goldmark]
+    [markup.goldmark.parser]
+      # 单独成段的图片不再被包进 <p>，渲染钩子才能输出合法的 <figure>
+      wrapStandAloneImageWithinParagraph = false
     [markup.goldmark.renderer]
       hardWraps = true        # 单个换行 → <br>，保住散文诗的断行；空行照旧分段
 
-[menu]
+# 页面目录里的原图默认会被原样发布（相机直出，几 MB，还带 EXIF）。
+# 关掉后只发布模板实际用到的资源，例如压缩后的 webp。
+[[cascade]]
+  [cascade.build]
+    publishResources = false
 
 [[menu.main]]
     name = "游记"
@@ -54,10 +67,10 @@ timeZone = 'Europe/Berlin'
    url = "/privacy/"
    weight = 90
 
-
-
 [params]
 description = "在人间漂流"
 mainSections = ["posts", "misc", "study", "reading"]
 custom_css = ["custom.css"]
 show_post_thumbnail = true
+# :date_long 按站点语言本地化，zh 下显示为「2024年12月29日」
+date_format = ":date_long"

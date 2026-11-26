@@ -2,34 +2,40 @@
   正文图片渲染钩子。
 
   Markdown 里写 ![alt](IMG_1.JPG "可选标题") 时：
-  - 指向页面 bundle 内的图片 → 压缩成 webp 并输出 srcset
-  - 外链或 static/ 图片 → 原样输出，只补上 loading / decoding
-  有 title 时包一层 <figure> 输出图注。
+  - 指向页面 bundle 内、可处理的位图 → 压缩成 webp 并输出 srcset
+  - 外链、static/ 图片、SVG / GIF → 原样输出，只补上 loading / decoding
+  单独成段的图片（.IsBlock）包一层 <figure>，有 title 时输出图注；
+  这依赖 hugo.toml 里的 wrapStandAloneImageWithinParagraph = false，否则会生成不合法的 <p><figure>。
 */}}
-{{- $img := "" -}}
+{{- $img := false -}}
 {{- if not (urls.Parse .Destination).IsAbs -}}
-  {{- $img = .PageInner.Resources.GetMatch .Destination -}}
-  {{- with and $img (ne $img.ResourceType "image") -}}{{- $img = "" -}}{{- end -}}
+  {{- with .PageInner.Resources.GetMatch .Destination -}}
+    {{- if partials.Include "func/IsProcessableImage.html" . -}}
+      {{- $img = . -}}
+    {{- end -}}
+  {{- end -}}
 {{- end -}}
 
-{{- with .Title -}}<figure class="post-figure">{{- end -}}
+{{- if .IsBlock -}}<figure class="post-figure">{{- end -}}
 
 {{- with $img -}}
-  {{- $mid := partials.Include "func/img-resize.html" (dict "img" . "width" 960) -}}
+  {{- $set := partials.Include "func/img-srcset.html" (dict "img" . "widths" (slice 480 960 1600)) -}}
   <img
-    src="{{ $mid.RelPermalink }}"
-    srcset="
-      {{ (partials.Include "func/img-resize.html" (dict "img" . "width" 480)).RelPermalink }} 480w,
-      {{ $mid.RelPermalink }} 960w,
-      {{ (partials.Include "func/img-resize.html" (dict "img" . "width" 1600)).RelPermalink }} 1600w"
+    src="{{ $set.fallback.RelPermalink }}"
+    srcset="{{ $set.srcset }}"
     sizes="(min-width: 50em) 45rem, 100vw"
-    width="{{ $mid.Width }}"
-    height="{{ $mid.Height }}"
+    width="{{ $set.fallback.Width }}"
+    height="{{ $set.fallback.Height }}"
     loading="lazy"
     decoding="async"
+    {{- if and (not $.IsBlock) $.Title }} title="{{ $.Title }}"{{ end }}
     alt="{{ $.Text | plainify }}">
 {{- else -}}
-  <img src="{{ .Destination | safeURL }}" loading="lazy" decoding="async" alt="{{ .Text | plainify }}">
+  <img src="{{ .Destination | safeURL }}" loading="lazy" decoding="async"
+    {{- if and (not .IsBlock) .Title }} title="{{ .Title }}"{{ end }} alt="{{ .Text | plainify }}">
 {{- end -}}
 
-{{- with .Title -}}<figcaption class="post-figcaption">{{ . }}</figcaption></figure>{{- end -}}
+{{- if .IsBlock -}}
+  {{- with .Title -}}<figcaption class="post-figcaption">{{ . }}</figcaption>{{- end -}}
+  </figure>
+{{- end -}}

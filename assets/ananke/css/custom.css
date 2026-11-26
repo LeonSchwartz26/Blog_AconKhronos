@@ -6,8 +6,8 @@
      德语/英文仍走主题原本的字体，中文落到系统黑体。 */
   --cjk: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", sans-serif;
 
-  /* 地图点位色。travel-map.js 用 getComputedStyle 读这个值，
-     所以改配色只改这一处，JS 不用动。 */
+  /* 地图点位色和气泡链接色。点位是 DOM 元素，直接用这个变量，
+     改配色只改这一处，JS 不用动。 */
   --map-accent: #9c4a33;
 }
 
@@ -55,6 +55,11 @@ h2,
   display: block;
 }
 
+/* 主题给 <main> 的 pb7（16rem）在首页底部留出一大块空白 */
+.is-home main.pb7 {
+  padding-bottom: 4rem;
+}
+
 /* 主题其它页面都是 mw7/mw8 居中，首页原本铺满视口，宽屏上和内页割裂 */
 .home-intro,
 .home-grid {
@@ -100,44 +105,109 @@ h2,
   outline-offset: 2px;
 }
 
-/* 照片长宽比不一会让右栏卡片高度参差、节奏很乱，统一裁成 4:3 */
+/* 照片长宽比不一会让右栏卡片高度参差、节奏很乱，统一裁成 4:3。
+   height:auto 不能省：<img height="…"> 属性会被当成固定高度，aspect-ratio 就失效了 */
 .home-card .img {
   width: 100%;
+  height: auto;
   aspect-ratio: 4 / 3;
   object-fit: cover;
 }
 
 /* ===== Travel map ===== */
 .travel-map {
+  position: relative;
   height: 380px;
   border-radius: 14px;
   overflow: hidden;
   border: 1px solid rgba(0, 0, 0, 0.08);
+  /* 接近 positron 底图的颜色，地图加载出来之前不会是一块刺眼的白 */
+  background: #f2f2ef;
 }
 
-/* 点位在 hover / focus 时会被 setStyle 换成放大版，这里补上过渡 */
+/* 地图画在这个子元素里；加载成功（.is-live）之前隐藏，下面的地点列表照常可见。
+   MapLibre 会给它加上 .maplibregl-map（position: relative），且 maplibre-gl.css 后加载，
+   这里必须多一级选择器，否则定位被覆盖、高度塌成 0，地图整个看不见 */
+.travel-map .travel-map-canvas {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+}
+
+.travel-map.is-live .travel-map-canvas {
+  visibility: visible;
+}
+
+.travel-map .maplibregl-map {
+  font-family: "helvetica neue", helvetica, arial, var(--cjk), sans-serif;
+}
+
+/* 无 JS / 无 WebGL / 底图被拦截时，容器里显示的地点列表 */
+.travel-map-fallback {
+  list-style: none;
+  margin: 0;
+  padding: 1rem;
+  height: 100%;
+  box-sizing: border-box;
+  overflow: auto;
+}
+
+.travel-map-fallback li + li {
+  margin-top: 0.35rem;
+}
+
+/* 地图可用后列表就多余了：点位本身可以用键盘 Tab 到、读屏软件会读出地名 */
+.travel-map.is-live .travel-map-fallback {
+  display: none;
+}
+
+/* ----- 点位 -----
+   外层 .travel-map-marker 的 transform 被 MapLibre 用来定位，放大只能做在内层圆点上。
+   外层比圆点大一圈，作为点击 / 触控区域。 */
 .travel-map-marker {
-  transition: fill-opacity 0.2s ease, stroke-width 0.2s ease, r 0.2s ease;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}
+
+/* 白描边让点在淡色底图上有一圈呼吸感，不至于糊进地面 */
+.travel-map-dot {
+  box-sizing: border-box;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: var(--map-accent);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  opacity: 0.9;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.travel-map-marker:hover .travel-map-dot,
+.travel-map-marker.is-active .travel-map-dot {
+  transform: scale(1.5);
+  opacity: 1;
+}
+
+.travel-map-marker:focus-visible {
+  outline: 2px solid var(--map-accent);
+  outline-offset: 1px;
+  border-radius: 50%;
 }
 
 /* ----- 气泡 -----
-   Leaflet 默认气泡是圆角白盒 + 重投影 + 系统无衬线，和正文的衬线调性不搭 */
-.travel-map-popup-box .leaflet-popup-content-wrapper {
+   默认气泡是直角白盒 + 系统无衬线，和正文的衬线调性不搭 */
+.travel-map-popup-box .maplibregl-popup-content {
   border-radius: 10px;
   border: 1px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  padding: 0;
-}
-
-.travel-map-popup-box .leaflet-popup-content {
-  margin: 0.85rem 1rem;
+  /* 右侧给关闭按钮留位置 */
+  padding: 0.85rem 1.75rem 0.85rem 1rem;
   font-family: georgia, times, var(--cjk), serif;
+  font-size: 0.9rem;
   line-height: 1.5;
-}
-
-.travel-map-popup-box .leaflet-popup-tip {
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 .travel-map-popup strong {
@@ -163,50 +233,33 @@ h2,
   content: " →";
 }
 
-.travel-map-popup-box .leaflet-popup-close-button {
+.travel-map-popup-box .maplibregl-popup-close-button {
+  top: 0.25rem;
+  right: 0.25rem;
   width: 1.5rem;
   height: 1.5rem;
-  padding: 0.35rem 0 0;
+  border-radius: 4px;
   font-size: 1rem;
+  line-height: 1;
   color: rgba(0, 0, 0, 0.35);
 }
 
 /* ----- 控件 -----
-   默认 +/− 是黑框粗按钮，在淡色底图上存在感过强 */
-.travel-map .leaflet-control-zoom {
-  border: none;
+   默认 +/− 是粗黑框按钮，在淡色底图上存在感过强。
+   maplibre-gl.css 在 main.css 之后加载，选择器要比它多一级才能盖住。 */
+.travel-map .maplibregl-ctrl-group:not(:empty) {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  border-radius: 6px;
 }
 
-.travel-map .leaflet-control-zoom a {
-  width: 1.75rem;
-  height: 1.75rem;
-  line-height: 1.75rem;
-  font-size: 1rem;
-  color: rgba(0, 0, 0, 0.55);
-  border-bottom-color: rgba(0, 0, 0, 0.06);
-}
-
-.travel-map .leaflet-control-zoom a:hover {
-  color: rgba(0, 0, 0, 0.85);
-}
-
-.travel-map .leaflet-control-attribution {
+.travel-map .maplibregl-ctrl.maplibregl-ctrl-attrib {
   background: rgba(255, 255, 255, 0.75);
   font-size: 0.65rem;
-  padding: 0 0.4rem;
   color: rgba(0, 0, 0, 0.45);
 }
 
-.travel-map .leaflet-control-attribution a {
+.travel-map .maplibregl-ctrl-attrib a {
   color: rgba(0, 0, 0, 0.55);
-}
-
-/* 无 JS 时降级成一个地点列表 */
-.travel-map-fallback {
-  list-style: none;
-  margin: 0;
-  padding: 1rem;
 }
 
 /* ===== Post images ===== */
@@ -238,7 +291,8 @@ h2,
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .home-card {
+  .home-card,
+  .travel-map-dot {
     transition: none;
   }
 }

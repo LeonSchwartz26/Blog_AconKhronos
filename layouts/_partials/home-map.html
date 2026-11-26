@@ -1,8 +1,11 @@
 {{/*
   home-map
 
-  渲染一张带点位的 Leaflet 地图。数据以 JSON 注入，逻辑在 assets/js/travel-map.js，
-  两者通过容器 id 关联，所以同一页面可以安全地放多张地图。
+  渲染一张带点位的 MapLibre GL 地图（底图来自 OpenFreeMap）。数据以 JSON 注入，
+  逻辑在 assets/js/travel-map.js，两者通过容器 id 关联，所以同一页面可以安全地放多张地图。
+
+  容器里先输出一份地点列表：没有 JS、没有 WebGL 或底图加载失败时它就是地图的替代品；
+  地图加载成功后 JS 会隐藏它（点位本身可以用键盘 Tab 到，读屏软件会读出地名）。
 
   @context Map  {"pages": Pages(需含 params.location.lat/lon), "id": String(可选)}
 */}}
@@ -11,7 +14,6 @@
 {{ $places := slice }}
 {{ range .pages }}
   {{ $places = $places | append (dict
-      "id"        .RelPermalink
       "title"     .Title
       "url"       .RelPermalink
       "date"      (.Date.Format "2006-01-02")
@@ -22,25 +24,24 @@
 {{ end }}
 
 {{ with $places }}
-  {{ with resources.Get "vendor/leaflet/leaflet.css" }}
+  {{ with resources.Get "vendor/maplibre-gl/maplibre-gl.css" }}
     <link rel="stylesheet" href="{{ (. | minify | fingerprint).RelPermalink }}">
   {{ end }}
 
   <div id="{{ $id }}" class="travel-map" data-travel-map role="region" aria-label="旅行地图">
-    <noscript>
-      <ul class="travel-map-fallback">
-        {{ range . }}
-          <li><a href="{{ .url }}">{{ .placeName }}{{ with .country }}（{{ . }}）{{ end }}</a></li>
-        {{ end }}
-      </ul>
-    </noscript>
+    <ul class="travel-map-fallback" aria-label="地图上的地点">
+      {{ range . }}
+        <li><a href="{{ .url }}">{{ .placeName }}{{ with .country }}（{{ . }}）{{ end }}</a></li>
+      {{ end }}
+    </ul>
   </div>
 
   {{/* jsonify 会把 < > & 转成 \u00xx，所以 </script> 无法提前闭合，safeJS 在这里是安全的；
        不加 safeJS 的话 Go 模板会把整段 JSON 再包一层字符串字面量。 */}}
   <script type="application/json" data-travel-map-for="{{ $id }}">{{ . | jsonify | safeJS }}</script>
 
-  {{ with resources.Get "vendor/leaflet/leaflet.js" }}
+  {{/* maplibre-gl.js 已是压缩版，只加指纹 */}}
+  {{ with resources.Get "vendor/maplibre-gl/maplibre-gl.js" }}
     <script defer src="{{ (. | fingerprint).RelPermalink }}"></script>
   {{ end }}
   {{ with resources.Get "js/travel-map.js" }}

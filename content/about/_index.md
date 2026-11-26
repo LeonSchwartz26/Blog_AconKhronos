@@ -1,5 +1,7 @@
 ---
 title: "Über den Autor"
+# 独立页面，不需要 RSS 订阅源
+outputs: ["html"]
 ---
 
 你好啊，我是 AconKhronos，

@@ -1,0 +1,29 @@
+{{/*
+  func/img-srcset
+
+  按给定宽度档位生成 srcset。只生成比原图窄的档位，原图不够宽时补一张原尺寸，
+  保证每个 w 描述符都是图片的真实宽度（否则浏览器会按错误宽度挑图）。
+
+  @context Map  {"img": Resource(image，须可处理，见 func/IsProcessableImage), "widths": Slice(int，升序)}
+
+  @returns Map  {"srcset": String, "fallback": Resource(最大的一档，用作 src / width / height)}
+*/}}
+{{ $img := .img }}
+{{ $parts := slice }}
+{{ $fallback := $img }}
+
+{{ range .widths }}
+  {{ if lt . $img.Width }}
+    {{ $r := partials.Include "func/img-resize.html" (dict "img" $img "width" .) }}
+    {{ $parts = $parts | append (printf "%s %dw" $r.RelPermalink $r.Width) }}
+    {{ $fallback = $r }}
+  {{ end }}
+{{ end }}
+
+{{ if le $img.Width (index .widths (sub (len .widths) 1)) }}
+  {{ $r := partials.Include "func/img-resize.html" (dict "img" $img "width" $img.Width) }}
+  {{ $parts = $parts | append (printf "%s %dw" $r.RelPermalink $r.Width) }}
+  {{ $fallback = $r }}
+{{ end }}
+
+{{ return dict "srcset" (delimit $parts ", ") "fallback" $fallback }}

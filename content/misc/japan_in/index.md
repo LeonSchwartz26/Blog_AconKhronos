@@ -6,7 +6,6 @@ location:
   country: "Japan"
   lat: 34.6664164
   lon: 135.4975411
-featured_image: "Sumiyoshi_Park.jpeg"
 draft: false
 ---
 
@@ -32,7 +31,7 @@ draft: false
 在野球場邊 我願意 和那些看著自己孩子表現的家長 坐在水泥地上
 看球飛上天空 振臂高呼 為他們贏得勝利而高興
 
-![住吉公園的野球場](Sumiyoshi_Park.jpeg "Sumiyoshi Park. shot on 23. Nov. 2025")
+![住吉公園的野球場](cover.jpg "Sumiyoshi Park. shot on 23. Nov. 2025")
 
 在我忙碌的旅行中 我是很願意拿出一些時刻
 和原本應該毫無相識機會的人 建立記憶

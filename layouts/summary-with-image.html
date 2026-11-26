@@ -1,5 +1,6 @@
-{{/* 覆盖主题的 summary-with-image：缩略图改成响应式 srcset + 懒加载，
-     并写死 width/height 以消除 CLS。其余结构与主题保持一致，方便日后对比升级。 */}}
+{{/* 覆盖主题的 summary-with-image（只在首页文章流里用到）：
+     缩略图改成响应式 srcset + 懒加载，并写死 width/height 以消除 CLS；
+     卡片标题由 h1 改为 h2。其余结构与主题保持一致，方便日后对比升级。 */}}
 {{ $featured_resource := partials.Include "func/GetFeaturedResource.html" . }}
 {{ $featured_image := partials.Include "func/GetFeaturedImage.html" . }}
 <article class="bb b--black-10">
@@ -7,33 +8,36 @@
     <div class="flex-column flex-row-ns flex">
       {{ if $featured_image }}
         <div class="{{ compare.Conditional (compare.Eq $.Site.Language.LanguageDirection "rtl") "pl3-ns" "pr3-ns" }} mb4 mb0-ns w-100 w-40-ns">
-          <a href="{{ .RelPermalink }}" class="db grow">
+          {{/* 图片链接和下面的标题链接指向同一篇文章：从 Tab 顺序和读屏里去掉，
+               避免同一个链接被访问两次；图片因此是装饰性的，alt 留空 */}}
+          <a href="{{ .RelPermalink }}" class="db grow" tabindex="-1" aria-hidden="true">
             {{ with $featured_resource }}
-              {{ $small := partials.Include "func/img-resize.html" (dict "img" . "width" 320) }}
-              {{ $mid := partials.Include "func/img-resize.html" (dict "img" . "width" 480) }}
-              {{ $large := partials.Include "func/img-resize.html" (dict "img" . "width" 720) }}
+              {{ $set := partials.Include "func/img-srcset.html" (dict "img" . "widths" (slice 320 480 720)) }}
+              {{/* 只有首页用这个模板（主题的列表页用 summary.html）。实测缩略图宽度：
+                   ≥901px 两栏时约 200–235px；30em–900px 单栏时约 40vw；更窄时铺满卡片 */}}
               <img
                 class="img"
-                src="{{ $mid.RelPermalink }}"
-                srcset="{{ $small.RelPermalink }} 320w, {{ $mid.RelPermalink }} 480w, {{ $large.RelPermalink }} 720w"
-                sizes="(min-width: 60em) 22rem, 100vw"
-                width="{{ $mid.Width }}"
-                height="{{ $mid.Height }}"
+                src="{{ $set.fallback.RelPermalink }}"
+                srcset="{{ $set.srcset }}"
+                sizes="(min-width: 56.3125em) 15rem, (min-width: 30em) calc(40vw - 2rem), calc(100vw - 4rem)"
+                width="{{ $set.fallback.Width }}"
+                height="{{ $set.fallback.Height }}"
                 loading="lazy"
                 decoding="async"
-                alt="{{ $.Params.location.name | default $.Title }}">
+                alt="">
             {{ else }}
-              <img src="{{ $featured_image }}" class="img" loading="lazy" decoding="async" alt="{{ .Title }}">
+              <img src="{{ $featured_image }}" class="img" loading="lazy" decoding="async" alt="">
             {{ end }}
           </a>
         </div>
       {{ end }}
       <div class="blah w-100{{ if $featured_image }} w-60-ns {{ compare.Conditional (compare.Eq $.Site.Language.LanguageDirection "rtl") "pr3-ns" "pl3-ns" }}{{ end }}">
-        <h1 class="f3 fw1 athelas mt0 lh-title">
+        {{/* 主题原版是 <h1>；首页的 h1 留给站点标题，卡片标题降为 h2 */}}
+        <h2 class="f3 fw1 athelas mt0 lh-title">
           <a href="{{ .RelPermalink }}" class="color-inherit dim link">
             {{ .Title }}
           </a>
-        </h1>
+        </h2>
         <div class="f6 f5-l lh-copy nested-copy-line-height nested-links">
           {{ .Summary }}
         </div>
