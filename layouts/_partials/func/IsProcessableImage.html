@@ -1,0 +1,17 @@
+{{/*
+  func/IsProcessableImage
+
+  判断资源能否交给 Resize 处理。SVG 没有像素尺寸，Resize 会直接报错让整站构建失败；
+  GIF 转 webp 可能丢掉动画。这两类原样输出更稳妥。
+
+  @context Resource
+
+  @returns Bool
+*/}}
+{{ $ok := false }}
+{{ with . }}
+  {{ if eq .ResourceType "image" }}
+    {{ $ok = in (slice "jpeg" "png" "webp" "tiff" "bmp") .MediaType.SubType }}
+  {{ end }}
+{{ end }}
+{{ return $ok }}

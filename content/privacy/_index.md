@@ -1,5 +1,7 @@
 ---
 title: "Privacy & Legal Notice"
+# 独立页面，不需要 RSS 订阅源
+outputs: ["html"]
 ---
 
 ## Verantwortlicher
@@ -64,36 +66,40 @@ Es findet keine Erstellung von Nutzerprofilen statt.
 
 ## Einbindung externer Inhalte
 
-Der einzige externe Dienst, zu dem dein Browser beim Besuch dieser Website eine Verbindung aufbaut, ist der nachfolgend beschriebene Kartenkachel-Anbieter.
+Der einzige externe Dienst, zu dem dein Browser beim Besuch dieser Website eine Verbindung aufbaut, ist der nachfolgend beschriebene Kartendienst.
 
-### Interaktive Karte (Leaflet & CARTO)
+### Interaktive Karte (MapLibre & OpenFreeMap)
 
 Auf der Startseite dieser Website wird eine interaktive Karte verwendet, um besuchte Orte visuell darzustellen und auf zugehörige Blogartikel zu verlinken.
 
-Die Darstellung der Karte erfolgt mithilfe der Open-Source-JavaScript-Bibliothek **Leaflet**, welche lokal auf dieser Website gehostet wird (kein Laden von externen Skripten oder Bibliotheken).
+Die Darstellung der Karte erfolgt mithilfe der Open-Source-JavaScript-Bibliothek **MapLibre GL JS**, welche lokal auf dieser Website gehostet wird (kein Laden von externen Skripten oder Bibliotheken).
 
-Zur Anzeige der Karteninhalte werden jedoch Kartenkacheln (Tiles) von Servern des Anbieters **CARTO** (CARTO Inc., New York, USA) geladen. Das dargestellte Kartenmaterial basiert auf Daten des Projekts **OpenStreetMap**.
+Die Kartendaten selbst (Vektorkacheln, Kartenstil, Schriftzeichen und Symbole) werden jedoch vom kostenlosen Open-Source-Kartendienst **OpenFreeMap** (https://tiles.openfreemap.org) geladen. Betreiber ist die **Hyperknot Software Kft.**, Ungarn. Das dargestellte Kartenmaterial basiert auf Daten des Projekts **OpenStreetMap** und dem Kachelschema von **OpenMapTiles**.
 
 #### Datenverarbeitung beim Laden der Karte
 
-Beim Aufruf einer Seite mit eingebetteter Karte stellt dein Browser eine Verbindung zu Servern von CARTO her, um die benötigten Kartenkacheln abzurufen. Dabei können aus technischen Gründen insbesondere folgende Daten verarbeitet werden:
+Beim Aufruf der Startseite stellt dein Browser eine Verbindung zu den Servern von OpenFreeMap her, um die benötigten Kartendaten abzurufen. Dabei können aus technischen Gründen insbesondere folgende Daten verarbeitet werden:
 
 - IP-Adresse
 - Datum und Uhrzeit des Zugriffs
-- aufgerufene Kartenkacheln
+- abgerufene Kartendaten
 - technische Informationen des Browsers (z. B. User-Agent)
+- die Adresse dieser Website (Referrer)
 
-Die Kartenkacheln werden über ein Content Delivery Network bereitgestellt, sodass Anfragen in der Regel an geografisch nahegelegene Server weitergeleitet werden.
+Nach Angaben des Betreibers setzt OpenFreeMap keine Cookies und verlangt weder eine Registrierung noch einen API-Schlüssel. Die Zugriffsprotokolle werden laut seiner Datenschutzerklärung anonymisiert und enthalten keine IP-Adressen; Fehlerprotokolle können die IP-Adresse und die abgerufene URL enthalten und werden nach 7 Tagen gelöscht.
 
 #### Datenübermittlung in Drittländer
 
-CARTO Inc. hat seinen Sitz in den USA. Es kann daher nicht ausgeschlossen werden, dass beim Laden der Kartenkacheln personenbezogene Daten (insbesondere die IP-Adresse) in die USA übermittelt werden.
+Die Hyperknot Software Kft. hat ihren Sitz in der Europäischen Union (Ungarn). Laut ihrer Datenschutzerklärung kann zur Auslieferung der Kartendaten jedoch das Content Delivery Network der **Cloudflare, Inc.** (USA) eingesetzt werden. Es kann daher nicht ausgeschlossen werden, dass beim Laden der Karte personenbezogene Daten (insbesondere die IP-Adresse) in die USA übermittelt werden.
 
-Wie beim Hosting gilt auch hier: Der Angemessenheitsbeschluss der Europäischen Kommission vom 10. Juli 2023 greift nur für Unternehmen, die unter dem **EU-US Data Privacy Framework (DPF)** zertifiziert sind. Ob CARTO Inc. aktuell zertifiziert ist, kannst du in der offiziellen Teilnehmerliste nachprüfen:  
+Wie beim Hosting gilt auch hier: Der Angemessenheitsbeschluss der Europäischen Kommission vom 10. Juli 2023 greift nur für Unternehmen, die unter dem **EU-US Data Privacy Framework (DPF)** zertifiziert sind. Ob Cloudflare, Inc. aktuell zertifiziert ist, kannst du in der offiziellen Teilnehmerliste nachprüfen:  
 https://www.dataprivacyframework.gov/list
 
-Weitere Informationen zur Datenverarbeitung durch CARTO findest du unter:  
-https://carto.com/privacy/
+Weitere Informationen zur Datenverarbeitung durch OpenFreeMap findest du unter:  
+https://openfreemap.org/privacy/
+
+Weitere Informationen zur Datenverarbeitung durch Cloudflare findest du unter:  
+https://www.cloudflare.com/privacypolicy/
 
 Weitere Informationen zu OpenStreetMap als Datengrundlage findest du unter:  
 https://osmfoundation.org/wiki/Privacy_Policy
@@ -105,7 +111,7 @@ Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse), da sie der anschaulichen Da
 
 #### Vermeidung der Datenverarbeitung
 
-Wenn du nicht möchtest, dass Kartenkacheln von CARTO geladen werden, kannst du Seiten mit Karteninhalten vermeiden oder externe Inhalte in deinem Browser blockieren (z. B. durch entsprechende Datenschutz- oder Content-Blocking-Einstellungen). Ohne aktiviertes JavaScript wird die Karte nicht geladen; stattdessen wird eine einfache Liste der Orte angezeigt.
+Wenn du nicht möchtest, dass Kartendaten von OpenFreeMap geladen werden, kannst du externe Inhalte in deinem Browser blockieren (z. B. durch entsprechende Datenschutz- oder Content-Blocking-Einstellungen). Ohne aktiviertes JavaScript – oder wenn die Kartendaten blockiert werden – wird die Karte nicht angezeigt; stattdessen erscheint eine einfache Liste der Orte.
 
 ---
 
@@ -178,6 +184,6 @@ Solltest du dich auf einem hier veröffentlichten Foto erkennen und mit der Ver�
 ## Aktualität und Änderungen
 
 Diese Datenschutzerklärung und rechtliche Hinweise haben den Stand:  
-**9. August 2026**
+**26. November 2026**
 
 Ich behalte mir vor, diese Seite anzupassen, um sie an geänderte rechtliche Anforderungen oder technische Änderungen anzupassen.
